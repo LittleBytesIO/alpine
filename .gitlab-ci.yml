@@ -1,0 +1,22 @@
+image: docker:latest
+
+# When using dind, it's wise to use the overlayfs driver for
+# improved performance.
+variables:
+  DOCKER_DRIVER: overlay
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+
+services:
+  - docker:dind
+  - docker login -u gitlab-ci-token -p $CI_COMMIT_TOKEN $CI_REGISTRY
+  
+before_script:
+- docker info
+
+build_image:
+  script:
+    #docker build -t $IMAGE_TAG .
+    - docker login -u="bobhenkel" -p="QbQKfuPa7bwdGQYYLGGhKsJqF9G2jB40YZ9DqKtks9DOhzLg/mlSxmEIKMCorUbg" quay.io
+    - docker build -t alpine:3.6 .
+    - docker tag alpine:3.6 quay.io/bobhenkel/alpine:3.6
+    - docker push quay.io/bobhenkel/alpine:3.6
